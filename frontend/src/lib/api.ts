@@ -1,6 +1,6 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 
-interface User {
+export interface User {
 	id: number;
 	username: string;
 }
