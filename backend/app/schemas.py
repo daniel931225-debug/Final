@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -16,3 +17,8 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase):
 	owner_id: int = Field(..., gt=0)
+
+
+class PostEdit(BaseModel):
+	title: Optional[str] = None
+	content: Optional[str] = None
