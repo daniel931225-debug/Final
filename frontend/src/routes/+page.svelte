@@ -1,23 +1,37 @@
 <script lang="ts">
 	import { fly, fade } from 'svelte/transition';
-	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data } = $props();
+</script>
 
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString('zh-TW', {
+{#snippet dateDisplay(dateString: string)}
+	<time
+		datetime={dateString}
+		class="flex items-center gap-1.5 font-medium text-blue-600 dark:text-blue-400"
+	>
+		<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+			/>
+		</svg>
+
+		{new Date(dateString).toLocaleDateString('zh-TW', {
 			year: 'numeric',
 			month: 'long',
 			day: 'numeric'
-		});
-	};
-</script>
+		})}
+	</time>
+{/snippet}
 
 <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:py-16">
 	<header class="mb-10 text-center sm:text-left">
 		<h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
 			最新文章
 		</h1>
+
 		<p class="mt-4 text-lg text-slate-600 dark:text-slate-400">探索我們的最新見解與技術分享</p>
 	</header>
 
@@ -35,21 +49,10 @@
 
 				<div class="flex flex-col gap-4">
 					<div class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-						<time
-							datetime={post.created_at}
-							class="flex items-center gap-1.5 font-medium text-blue-600 dark:text-blue-400"
-						>
-							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-								/>
-							</svg>
-							{formatDate(post.created_at)}
-						</time>
+						{@render dateDisplay(post.created_at)}
+
 						<span class="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+
 						<span>文章</span>
 					</div>
 
