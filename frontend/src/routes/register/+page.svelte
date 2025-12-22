@@ -4,18 +4,19 @@
 	import { resolve } from '$app/paths';
 	import { api } from '$lib/api';
 
-	let username = '';
-	let password = '';
-	let confirmPassword = '';
+	let username = $state('');
+	let password = $state('');
+	let confirmPassword = $state('');
 
-	let showPassword = false;
-	let isLoading = false;
-	let errorMessage = '';
+	let showPassword = $state(false);
+	let isLoading = $state(false);
+	let errorMessage = $state('');
 
-	$: passwordMismatch = confirmPassword && password !== confirmPassword;
-	$: isFormValid = username.length > 0 && password.length >= 8 && !passwordMismatch;
+	let passwordMismatch = $derived(confirmPassword !== '' && password !== confirmPassword);
+	let isFormValid = $derived(username.length > 0 && password.length >= 8 && !passwordMismatch);
 
-	async function handleSubmit() {
+	async function handleSubmit(e: Event) {
+		e.preventDefault();
 		errorMessage = '';
 
 		if (password !== confirmPassword) {
@@ -36,6 +37,68 @@
 		}
 	}
 </script>
+
+{#snippet iconSpinner()}
+	<svg
+		class="mr-3 h-5 w-5 animate-spin text-white"
+		xmlns="http://www.w3.org/2000/svg"
+		fill="none"
+		viewBox="0 0 24 24"
+	>
+		<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+
+		<path
+			class="opacity-75"
+			fill="currentColor"
+			d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet iconArrowRight()}
+	<svg
+		class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
+		fill="none"
+		viewBox="0 0 24 24"
+		stroke="currentColor"
+	>
+		<path
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			stroke-width="2"
+			d="M17 8l4 4m0 0l-4 4m4-4H3"
+		/>
+	</svg>
+{/snippet}
+
+{#snippet iconEye(visible: boolean)}
+	{#if visible}
+		<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+			/>
+		</svg>
+	{:else}
+		<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+			/>
+
+			<path
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+			/>
+		</svg>
+	{/if}
+{/snippet}
 
 <div class="flex min-h-[85vh] items-center justify-center px-4 py-12">
 	<div
@@ -72,7 +135,7 @@
 				</div>
 			{/if}
 
-			<form class="flex flex-col gap-5" on:submit|preventDefault={handleSubmit}>
+			<form class="flex flex-col gap-5" onsubmit={handleSubmit}>
 				<div class="group">
 					<label
 						for="username"
@@ -127,35 +190,10 @@
 
 						<button
 							type="button"
-							on:click={() => (showPassword = !showPassword)}
+							onclick={() => (showPassword = !showPassword)}
 							class="absolute top-0 right-0 flex h-full w-12 items-center justify-center text-slate-400 hover:text-slate-600 focus:outline-none dark:hover:text-slate-200"
-							tabindex="-1"
 						>
-							{#if showPassword}
-								<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-									/>
-								</svg>
-							{:else}
-								<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-									/>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-									/>
-								</svg>
-							{/if}
+							{@render iconEye(showPassword)}
 						</button>
 					</div>
 				</div>
@@ -194,43 +232,11 @@
 					disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:shadow-none"
 				>
 					{#if isLoading}
-						<svg
-							class="mr-3 h-5 w-5 animate-spin text-white"
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							></circle>
-
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							></path>
-						</svg>
+						{@render iconSpinner()}
 						處理中...
 					{:else}
 						註冊帳號
-						<svg
-							class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M17 8l4 4m0 0l-4 4m4-4H3"
-							/>
-						</svg>
+						{@render iconArrowRight()}
 					{/if}
 				</button>
 
