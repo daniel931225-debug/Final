@@ -7,7 +7,7 @@ export class UserState<LoggedIn extends boolean = boolean> {
 	private loggedIn: LoggedIn;
 
 	constructor(init?: User | null) {
-		this.loggedIn = false as LoggedIn;
+		this.loggedIn = !!init as LoggedIn;
 		this.current = $state<User | null>(init ?? null) as ConditionalOrNull<LoggedIn, User>;
 	}
 
