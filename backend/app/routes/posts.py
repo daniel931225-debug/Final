@@ -81,3 +81,23 @@ async def edit_post(
 	db.commit()
 	db.refresh(post)
 	return {"message": "Post updated successfully", "data": post}
+
+
+@router.delete("/{id}")
+async def delete_post(
+	id: int,
+	response: Response,
+	jwt_payload: dict[str, Any] = Depends(auth_dependency),
+	db: Session = Depends(get_db),
+):
+	post = db.query(Post).filter(Post.id == id).first()
+	if not post:
+		response.status_code = status.HTTP_404_NOT_FOUND
+		return {"message": "Post not found"}
+	if post.owner_id != jwt_payload["user_id"]:
+		response.status_code = status.HTTP_403_FORBIDDEN
+		return {"message": "You are not authorized to delete this post"}
+
+	db.delete(post)
+	db.commit()
+	return {"message": "Post deleted successfully"}
