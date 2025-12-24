@@ -57,3 +57,17 @@ async def read_user_by_id(id: int, response: Response, db: Session = Depends(get
 		print(e)
 		response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 		return {"message": "An error occurred while fetching user data"}
+
+
+@router.get("/{id}/posts")
+async def read_user_posts_by_id(
+	id: int, response: Response, db: Session = Depends(get_db)
+):
+	try:
+		posts = db.query(Post).filter(Post.owner_id == id).all()
+
+		return {"message": "Successfully fetched user's posts", "data": posts}
+	except SQLAlchemyError as e:
+		print(e)
+		response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+		return {"message": "An error occurred while fetching user's posts"}
